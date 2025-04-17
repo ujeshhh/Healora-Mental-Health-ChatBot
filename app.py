@@ -411,7 +411,7 @@ def confirm_emergency_meeting(confirm, state):
         age = meeting_info["age"]
         user_email = meeting_info["user_email"]
         meeting_link = meeting_info["meeting_link"]
-        therapist_email = "ujesh2005@gmail.com"
+        therapist_email = os.getenv("THERAPIST_GMAIL_ADDRESS")
         
         alert_body = f"""
 Dear {therapist},
@@ -433,14 +433,14 @@ Healora
         try:
             service = get_gmail_service()
             service.users().messages().send(userId="me", body=alert_message).execute()
-            return f"Emergency meeting alert sent to {therapist_email}. Join the meeting at {meeting_link}.", state
+            return f"Emergency meeting alert sent to {therapist}. Join the meeting at {meeting_link}.", state
         except Exception as e:
             state["failed_emails"].append({
                 "therapist_email": {"to": therapist_email, "subject": "Emergency Meeting Request", "body": alert_body},
                 "error": str(e),
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             })
-            return (f"Failed to send emergency meeting alert to {therapist_email}. "
+            return (f"Failed to send emergency meeting alert to {therapist}. "
                     f"Please contact {therapist_email} directly with the meeting link: {meeting_link}."), state
     else:
         return "Emergency meeting cancelled.", state
